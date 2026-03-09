@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字多媒体文化墙设计提示词生成器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #0284C7;
+      --primary-light: #38BDF8;
+      --primary-dark: #0369A1;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --bg-dark: #0F172A;
+      --bg-card: #1E293B;
+      --bg-item: #1F2937;
+      --text-primary: #FFFFFF;
+      --text-secondary: #94A3B8;
+      --border: rgba(148, 163, 184, 0.1);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "思源黑体", sans-serif;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      padding: 20px 0 100px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(2, 132, 199, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      text-align: center;
+      padding: 48px 20px 32px;
+    }
+
+    .header h1 {
+      font-size: clamp(24px, 6vw, 36px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #38BDF8 0%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .header .feature-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10B981;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-section {
+      max-width: 920px;
+      margin: 0 auto 32px;
+      padding: 0 20px;
+    }
+
+    .input-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .input-wrap:hover {
+      border-color: rgba(2, 132, 199, 0.3);
+      box-shadow: 0 20px 60px rgba(2, 132, 199, 0.1);
+    }
+
+    .input-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-box,
+    .input-textarea {
+      padding: 13px 16px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--text-primary);
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .input-box:focus,
+    .input-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    }
+
+    .input-textarea {
+      min-height: 120px;
+      resize: vertical;
+      max-height: 300px;
+      line-height: 1.6;
+    }
+
+    .char-count {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn {
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(2, 132, 199, 0.2);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(2, 132, 199, 0.15);
+      color: var(--primary-light);
+      border: 1px solid rgba(2, 132, 199, 0.3);
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(2, 132, 199, 0.25);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .result-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    .result-title {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .result-count {
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.3);
+      color: var(--primary-light);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .result-item {
+      background: var(--bg-item);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .result-item:hover {
+      border-color: rgba(2, 132, 199, 0.3);
+      background: rgba(31, 41, 55, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1);
+    }
+
+    .result-item:hover::before {
+      opacity: 1;
+    }
+
+    .result-number {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .result-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      word-break: break-word;
+      overflow-wrap: break-word;
+      min-height: 140px;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.3);
+      border-radius: 8px;
+      cursor: text;
+      user-select: text;
+      transition: all 0.3s;
+    }
+
+    .result-text:hover {
+      background: rgba(2, 132, 199, 0.08);
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+      justify-self: end;
+      margin-top: 8px;
+    }
+
+    .btn-copy,
+    .btn-delete {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(2, 132, 199, 0.3);
+      background: rgba(2, 132, 199, 0.1);
+      color: var(--primary-light);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: inherit;
+    }
+
+    .btn-copy:hover {
+      background: rgba(2, 132, 199, 0.2);
+      border-color: rgba(2, 132, 199, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-copy.copied {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.1);
+      color: #FCA5A5;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .batch-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-batch {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid rgba(2, 132, 199, 0.3);
+      background: rgba(2, 132, 199, 0.1);
+      color: var(--primary-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: inherit;
+    }
+
+    .btn-batch:hover {
+      background: rgba(2, 132, 199, 0.2);
+      border-color: rgba(2, 132, 199, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.15);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-item);
+      color: var(--text-primary);
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-left: 3px solid var(--success);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.3s ease-out;
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(420px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      to {
+        transform: translateX(420px);
+        opacity: 0;
+      }
+    }
+
+    .toast.hide {
+      animation: slideOut 0.3s ease-out forwards;
+    }
+
+    #copyBuffer {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+
+    @media (max-width: 640px) {
+      .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .toast {
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <textarea id="copyBuffer"></textarea>
+
+  <div class="header">
+    <h1>🖥 数字多媒体文化墙设计提示词生成器</h1>
+    <p class="subtitle">融合LED屏、触摸屏、投影、灯光、音响等数字多媒体技术的沉浸式文化墙设计</p>
+    <div class="feature-badge">✓ 20组独特方案 | 专业级提示词</div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-wrap">
+      <div class="input-group">
+        <div class="form-control">
+          <label class="form-label" for="spaceInput">空间类型</label>
+          <input
+            id="spaceInput"
+            class="input-box"
+            type="text"
+            placeholder="例如：企业展示厅、科技馆、教育机构、商业空间、展览空间"
+            maxlength="100"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="form-label" for="themeInput">文化墙主题</label>
+          <input
+            id="themeInput"
+            class="input-box"
+            type="text"
+            placeholder="例如：企业发展历程、品牌故事、创新科技展示、教育互动墙"
+            maxlength="100"
+          />
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="form-label" for="contentInput">内文及多媒体内容描述</label>
+        <textarea
+          id="contentInput"
+          class="input-textarea"
+          placeholder="输入文化墙内容及多媒体互动描述（文字、图像、动画、交互元素等，将完整保留在提示词中）"
+          maxlength="500"
+        ></textarea>
+        <div class="char-count">
+          <span id="charCount">0</span> / 500 字符
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="generateBtn" class="btn btn-primary" onclick="app.generate()">
+          <span>✨</span> 生成20组提示词
+        </button>
+        <button id="clearBtn" class="btn btn-secondary" onclick="app.clear()" style="display:none;">
+          清除
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-section">
+    <div id="resultWrap"></div>
+  </div>
+
+  <script>
+    // ===== 数字多媒体文化墙设计配置 =====
+    const designConfigs = {
+      mediaDevices: [
+        "采用超大LED屏幕主显示，辅以边框LED灯带，动态内容实时切换，高刷新率呈现流畅动画",
+        "融合4K高分辨率LED显示屏加全屏触摸交互屏，支持手势识别、多点触控互动体验",
+        "多屏拼接LED墙加投影映射技术，实现沉浸式视觉包围，动态投影效果增强空间感",
+        "超高清OLED显示屏加3D全息投影交互，呈现三维立体视觉效果，科技感十足",
+        "曲面LED显示屏加人体感应互动，靠近自动触发动画，离开后缓慢淡出，互动性强",
+        "透明LED屏幕嵌入式设计，与背景融为一体，内容悬浮展示，视觉冲击力强",
+        "分层多屏显示系统，前层交互屏、中层内容展示屏、后层背景装饰屏，纵深感强",
+        "模块化拼装LED屏幕，支持自定义尺寸与形状，灵活组合创意展示方案",
+        "触摸交互投影墙，地面感应系统联动投影，步入区域触发动画交互，沉浸度高",
+        "全息透明屏展示，配合激光投影背景，营造虚实结合的未来感体验",
+        "环形包围式多屏显示，观众置身屏幕包围，全方位沉浸式视觉体验",
+        "双层叠加屏幕显示，前层动画、后层背景实时联动，深度感十足",
+        "超宽比例异形屏幕，突破传统比例限制，创意展示方案独特",
+        "智能分辨率自适应屏幕，根据距离自动调整显示细节，观看体验最优",
+        "可调节亮度和色温LED屏，支持根据环境自动适应显示效果",
+        "游走式移动显示屏，屏幕可沿轨道移动展示不同内容",
+        "柔性折叠屏幕系统，可实现弯曲展示，形成特殊空间感",
+        "纳米膜反射显示，不需背光仍能高清展示，节能环保",
+        "云雾投影效果，投影内容悬浮于云雾中，幻想感强",
+        "交互式激光雕刻投影，激光与屏幕交互展示，科技前卫"
+      ],
+
+      interactiveFeatures: [
+        "支持点击触摸交互，用户通过按压屏幕查看详细信息，反馈动画流畅",
+        "实现滑动手势操作，内容可左右滑动切换，上下滑动浏览更多信息",
+        "集成人体感应系统，靠近自动激活内容播放，离开后缓慢退出",
+        "支持语音交互功能，语音指令控制内容播放和页面切换",
+        "双指缩放交互，用户可放大缩小图片和文字，自由调节浏览尺寸",
+        "长按识别功能，长按屏幕识别二维码，跳转扩展信息链接",
+        "摄像头人脸识别交互，检测观众年龄和性别，推荐个性化内容",
+        "实时数据可视化展示，动态图表随数据变化实时更新，信息生动有力",
+        "AR增强现实互动，通过手机扫描触发AR效果，虚实结合深度体验",
+        "多人协作交互模式，支持多个用户同时触控不同区域，社交互动性强",
+        "轨迹记录追踪互动，记录用户触摸轨迹，展现数据可视化",
+        "温度感应互动，用户接近时屏幕温度变化触发反应",
+        "声音频率识别互动，根据环境声音频率调整显示内容",
+        "重力感应互动，倾斜屏幕改变显示方向和内容",
+        "眼球追踪互动，根据观众视线自动调整展示重点",
+        "心率感应互动，检测用户心率变化触发不同内容",
+        "位置定位互动，根据用户在展示区位置显示对应内容",
+        "时间序列互动，根据参观时间自动调整展示进度",
+        "手势识别进阶版，识别复杂手势动作触发特定互动",
+        "脑波感应交互，通过脑波变化控制内容展示"
+      ],
+
+      layouts: [
+        "主屏占比65%居中展示，两侧辅助信息屏各占比17.5%，上方标题区占10%",
+        "左侧操作导航屏占比20%，右侧大屏幕展示占比80%，上下分割功能区",
+        "全屏主显示加底部交互条，主屏70%、交互菜单区30%，功能分层明确",
+        "多屏拼接无缝显示，中心4屏组成主展示，周围8屏环绕辅助信息",
+        "对称式布局，左右两屏对应展示，中间区域为互动操控点，平衡感强",
+        "竖向堆叠三层屏幕，上中下各占33%，分别展示标题、主内容、互动控制",
+        "曲线环绕式屏幕组合，形成弧形包裹感，增强沉浸式体验",
+        "网格式分割显示，6-9块屏幕组成矩阵，每块显示独立内容或联动效果",
+        "阶梯式递进布局，屏幕按大小递进排列，形成视觉层次递进",
+        "自由散点式布局，多块屏幕随意组合，营造活力感和创意感",
+        "Z字形阅读动线布局，屏幕按Z形排列引导观众视线流动",
+        "环形围绕式布局，屏幕环绕中心点，形成完整包裹体验",
+        "金字塔式堆叠布局，屏幕从小到大或从大到小递进排列",
+        "对角线递进布局，屏幕沿对角线递进排列，动感十足",
+        "十字交叉布局，横竖屏幕交叉组合，视觉焦点明确",
+        "梅花式散点布局，多屏按梅花形排列，空间感充足",
+        "星形辐射布局，多屏围绕中心星形展开，聚焦力强",
+        "波浪形排列布局，屏幕按波浪形上下排列，流动感强",
+        "螺旋式递进布局，屏幕沿螺旋形递进，深度感十足",
+        "自定义异形拼接，根据空间自由设计屏幕拼接方案"
+      ],
+
+      soundSystems: [
+        "立体声环绕音响系统，前后左右均布置扬声器，营造沉浸式音频环境",
+        "杜比全景声音效设计，实现三维立体音场，增强视听沉浸感",
+        "低频重强劲有力，高频清晰通透，中频平衡自然，频响范围广",
+        "智能音量自适应，根据环境噪音自动调节播放音量，保持清晰度",
+        "多音轨同步播放，背景音乐、旁白、音效独立控制混合播放",
+        "音乐节奏与视觉同步，灯光和屏幕动画随音乐节拍变化",
+        "指向性音频技术，不同区域播放不同音频内容，互不干扰",
+        "实时语音识别播报，将多媒体内容转化为语音同步输出",
+        "高保真无损音频播放，确保音质清晰逼真，细节完整呈现",
+        "空间音频定位技术，声音来源方向感强，增强三维立体感",
+        "频率调节系统，可根据展示内容调节音频频率",
+        "回音消除技术，防止音频回音干扰，清晰度最高",
+        "低频震感效果，通过低频音响产生身体震感，沉浸感极强",
+        "分区域音量控制，不同展示区域音量分别调节",
+        "音频跟随交互，用户交互时音频反馈即时响应",
+        "多语言音频切换，支持多种语言音频自动切换",
+        "立体声位置定位，音源位置精确定位到三维空间",
+        "音频动态范围优化，避免音频过度压缩失真",
+        "实时混音系统，多音源实时混音处理",
+        "音频时间同步校准，确保音画完全同步"
+      ],
+
+      lightingDesigns: [
+        "动态LED背景灯带，随屏幕内容变色，营造沉浸式色彩氛围",
+        "精准聚光筒灯照射屏幕，突出显示区域，其他区域适度压暗",
+        "环境照明加重点补光，整体亮度均衡，关键区域照度更高",
+        "色温随内容变化，暖色温强调温馨感，冷色温表现科技感",
+        "频闪效果与动画同步，灯光闪烁跟随屏幕动画，视觉冲击强",
+        "渐变光影效果，灯光从一个位置渐进到另一个位置，流动感强",
+        "隐藏式灯光设计，光源不可见，只看光的效果，专业感强",
+        "RGB动态灯光可调，支持上百万种色彩组合，创意表现无限",
+        "日光色温照明，接近自然光线，色彩还原精准无偏差",
+        "分区域独立照明，不同功能区域照度与色温分别控制，灵活性强",
+        "激光投影灯光系统，激光投影与LED灯光联动，科技感十足",
+        "荧光效果灯光，在紫外线照射下产生荧光效果",
+        "全息光影投影，营造虚实结合的光影视觉",
+        "脉冲式灯光效果，灯光明暗快速变换，增强节奏感",
+        "跟踪聚焦灯光，灯光自动跟随屏幕变化重点",
+        "分层式灯光布置，多层灯光营造前后深度感",
+        "霓虹灯管装饰照明，营造赛博朋克科技氛围",
+        "调节光谱灯光系统，精确控制光线波长和强度",
+        "雾化投影灯光，通过喷雾营造特殊光影效果",
+        "时间序列灯光编程，灯光效果随时间自动变化"
+      ],
+
+      colorSchemes: [
+        "深蓝加霓虹青绿，科技现代感强，沉浸式体验深入",
+        "黑色基底加亮白加紫色点缀，高对比度，视觉冲击力强",
+        "暗灰加冷白加荧光色，未来科技风格，炫彩感十足",
+        "深紫加电光蓝加白，酷炫夜光效果，视觉张力足",
+        "高级灰加金色加玻璃白，优雅科技，高端专业感",
+        "纯黑加霓虹粉加亮银，赛博朋克风格，视觉吸睛",
+        "深蓝加明亮湖蓝加白，清新科技感，平衡舒适",
+        "黑色加彩虹渐变加半透白，动感创意，活力十足",
+        "暗绿加电光青加白，生态科技风，高级感十足",
+        "深灰加多彩霓虹加半透明白，炫彩科技，现代感爆表",
+        "深蓝加电光黄加白色强调，活力现代，冲击力强",
+        "黑色加冷白加蓝紫渐变，极简未来，高级感十足",
+        "暗灰加橙色点缀加白，温暖科技，人文感强",
+        "深紫加青绿加银色，神秘科技，艺术感十足",
+        "纯黑加彩色渐变加透明白，炫彩现代，视觉层次丰富",
+        "暗绿加黄色加透光白，生态活力，自然科技结合",
+        "深蓝加粉色加金色，甜蜜科技，品质感强",
+        "黑色加白色加多彩点缀，简约现代，焦点突出",
+        "深灰加橙蓝渐变加白，对比现代，视觉生动",
+        "黑色加全色谱霓虹加白，全彩科技，极致炫彩"
+      ],
+
+      typography: [
+        "标题字号60-80厘米加投影放大，副标题20-30厘米，正文12-18厘米，层级清晰",
+        "标题采用粗黑体加描边效果，副标题细体，数据展示等宽字体，对比明显",
+        "所有文字为清晰可读的简体中文，支持动画出现和淡出效果",
+        "标题居中加投影阴影效果，副标题左对齐，产品说明右对齐，视觉均衡",
+        "关键数据加粗加放大加变色，引导用户注意力集中",
+        "段落文字行距40毫米，字间距12毫米，排版舒适不拥挤",
+        "标题与屏幕间距保持30厘米以上，营造视觉呼吸感",
+        "动态文字效果，文字逐字出现或滑入屏幕，增强视觉表现力",
+        "实时更新数据显示，文字与数字自动刷新，同步展示最新信息",
+        "多语言双语显示，中英文对照，支持语言切换功能",
+        "加粗标题字体，确保远距离可见性，可读性最高",
+        "渐变色文字效果，文字颜色从一色渐进到另一色，动感十足",
+        "发光文字效果，文字周围发光，科技感十足",
+        "文字3D透视效果，营造空间立体感",
+        "手写风格艺术字，融合艺术感与现代感",
+        "数字滚动动画效果，数字自动递增递减",
+        "文字扭曲变形效果，文字随动画变形，动感强",
+        "粒子分散重聚效果，文字分散成粒子再重聚",
+        "故事叙述文字流，文字按故事进度逐步展现",
+        "交互式文字响应，用户交互时文字立即反应"
+      ]
+    };
+
+    // ===== 复制管理器 =====
+    const copyManager = {
+      async useClipboardAPI(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (err) {
+          console.warn('Clipboard API failed:', err);
+          return false;
+        }
+      },
+
+      useExecCommand(text) {
+        try {
+          const textarea = document.getElementById('copyBuffer');
+          textarea.value = text;
+          textarea.select();
+          textarea.setSelectionRange(0, text.length);
+          const success = document.execCommand('copy');
+          textarea.value = '';
+          return success;
+        } catch (err) {
+          console.warn('ExecCommand failed:', err);
+          return false;
+        }
+      },
+
+      showManualCopy(text) {
+        const textarea = document.getElementById('copyBuffer');
+        textarea.value = text;
+        textarea.select();
+        textarea.setSelectionRange(0, text.length);
+        
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(textarea);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        return true;
+      },
+
+      async copy(text) {
+        const apiSuccess = await this.useClipboardAPI(text);
+        if (apiSuccess) {
+          return { success: true, method: 'clipboard-api' };
+        }
+
+        const execSuccess = this.useExecCommand(text);
+        if (execSuccess) {
+          return { success: true, method: 'exec-command' };
+        }
+
+        this.showManualCopy(text);
+        return { success: false, method: 'manual', needsHelp: true };
+      }
+    };
+
+    // ===== 应用主程序 =====
+    const app = {
+      prompts: [],
+
+      validate() {
+        const space = this.trim('spaceInput');
+        const theme = this.trim('themeInput');
+        const content = this.trim('contentInput');
+
+        if (!space) {
+          this.toast('请输入空间类型', 'error');
+          return false;
+        }
+        if (!theme) {
+          this.toast('请输入文化墙主题', 'error');
+          return false;
+        }
+        if (!content) {
+          this.toast('请输入内文及多媒体内容描述', 'error');
+          return false;
+        }
+        return true;
+      },
+
+      generate() {
+        if (!this.validate()) return;
+
+        const btn = document.getElementById('generateBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> 生成中...';
+
+        setTimeout(() => {
+          const space = this.trim('spaceInput');
+          const theme = this.trim('themeInput');
+          const content = this.trim('contentInput');
+
+          this.prompts = this.buildPrompts(space, theme, content);
+          this.render();
+
+          btn.disabled = false;
+          btn.innerHTML = '<span>✨</span> 生成20组提示词';
+          document.getElementById('clearBtn').style.display = 'inline-flex';
+
+          this.toast('✓ 已成功生成20组专业级提示词');
+        }, 400);
+      },
+
+      buildPrompts(space, theme, content) {
+        const prompts = [];
+
+        for (let i = 0; i < 20; i++) {
+          const media = designConfigs.mediaDevices[i % designConfigs.mediaDevices.length];
+          const interactive = designConfigs.interactiveFeatures[i % designConfigs.interactiveFeatures.length];
+          const layout = designConfigs.layouts[i % designConfigs.layouts.length];
+          const sound = designConfigs.soundSystems[i % designConfigs.soundSystems.length];
+          const lighting = designConfigs.lightingDesigns[i % designConfigs.lightingDesigns.length];
+          const color = designConfigs.colorSchemes[i % designConfigs.colorSchemes.length];
+          const typography = designConfigs.typography[i % designConfigs.typography.length];
+
+          const prompt = `${space}真实展示空间，${theme}数字多媒体文化墙，${media}。${interactive}。${layout}。内文内容为：${content}。音响系统设计：${sound}。灯光方案：${lighting}。色彩采用${color}搭配，整体高科技现代感。文字排版：${typography}。整体设计强调高科技感、现代感、互动性、沉浸式体验、信息可视化，多媒体设备与空间完美融合，可落地实施。正视角拍摄，镜头与文化墙保持垂直，整面文化墙完整出现在画面中，比例端正。文化墙正面完全展示。`;
+
+          prompts.push(prompt);
+        }
+
+        return prompts;
+      },
+
+      render() {
+        const wrap = document.getElementById('resultWrap');
+        wrap.innerHTML = '';
+
+        const header = document.createElement('div');
+        header.className = 'result-header';
+        header.innerHTML = `
+          <div class="result-title">
+            📋 生成结果
+            <span class="result-count">${this.prompts.length} 组提示词</span>
+          </div>
+        `;
+        wrap.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.className = 'result-grid';
+
+        this.prompts.forEach((prompt, idx) => {
+          const item = document.createElement('div');
+          item.className = 'result-item';
+          item.dataset.index = idx;
+
+          item.innerHTML = `
+            <div class="result-number">
+              提示词 ${idx + 1}
+            </div>
+            <div class="result-text">${this.escape(prompt)}</div>
+            <div class="result-actions">
+              <button class="btn-copy" onclick="app.copySingle(${idx})">复制</button>
+              <button class="btn-delete" onclick="app.delete(${idx})">删除</button>
+            </div>
+          `;
+
+          grid.appendChild(item);
+        });
+
+        wrap.appendChild(grid);
+
+        const batch = document.createElement('div');
+        batch.className = 'batch-actions';
+        batch.innerHTML = `
+          <button class="btn-batch" onclick="app.copyAll()">复制全部20组</button>
+          <button class="btn-batch" onclick="app.exportTxt()">导出为文本</button>
+          <button class="btn-batch" onclick="app.clearResults()">清空结果</button>
+        `;
+        wrap.appendChild(batch);
+      },
+
+      async copySingle(idx) {
+        const btns = document.querySelectorAll('.btn-copy');
+        const btn = btns[idx];
+        btn.disabled = true;
+        
+        const result = await copyManager.copy(this.prompts[idx]);
+        
+        if (result.success) {
+          btn.classList.add('copied');
+          btn.textContent = '已复制';
+          this.toast('✓ 复制成功');
+          
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '复制';
+            btn.disabled = false;
+          }, 2000);
+        } else if (result.needsHelp) {
+          this.toast('✓ 文本已选中，按 Ctrl+C 复制', 'warning');
+          btn.innerHTML = '已选中';
+          btn.disabled = false;
+          
+          setTimeout(() => {
+            btn.innerHTML = '复制';
+          }, 3000);
+        } else {
+          this.toast('复制失败，请使用导出功能', 'error');
+          btn.disabled = false;
+        }
+      },
+
+      async copyAll() {
+        const text = this.prompts.map((p, i) => `【提示词${i + 1}】\n${p}`).join('\n\n');
+        const result = await copyManager.copy(text);
+        
+        if (result.success) {
+          this.toast('✓ 已复制全部20组提示词');
+        } else if (result.needsHelp) {
+          this.toast('✓ 文本已选中，按 Ctrl+C 复制全部', 'warning');
+        } else {
+          this.toast('复制失败，请使用导出功能', 'error');
+        }
+      },
+
+      exportTxt() {
+        const text = this.prompts.map((p, i) => `【提示词${i + 1}】\n${p}\n`).join('\n');
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `数字多媒体文化墙提示词_${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        this.toast('✓ 文件已下载');
+      },
+
+      delete(idx) {
+        this.prompts.splice(idx, 1);
+        this.render();
+        this.toast('已删除该提示词');
+      },
+
+      clearResults() {
+        if (confirm('确认要清空所有结果吗？')) {
+          this.prompts = [];
+          document.getElementById('resultWrap').innerHTML = '';
+          this.toast('已清空所有结果');
+        }
+      },
+
+      clear() {
+        document.getElementById('spaceInput').value = '';
+        document.getElementById('themeInput').value = '';
+        document.getElementById('contentInput').value = '';
+        document.getElementById('charCount').textContent = '0';
+        document.getElementById('clearBtn').style.display = 'none';
+        this.prompts = [];
+        document.getElementById('resultWrap').innerHTML = '';
+      },
+
+      trim(id) {
+        return document.getElementById(id).value.trim().replace(/\s+/g, ' ');
+      },
+
+      escape(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      },
+
+      toast(msg, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add('hide');
+          setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+      }
+    };
+
+    document.getElementById('contentInput').addEventListener('input', (e) => {
+      document.getElementById('charCount').textContent = e.target.value.length;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') app.generate();
+    });
+  </script>
+</body>
+</html>
